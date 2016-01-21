@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Now I Know It!</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_info">Info</string>
+    <string name="info_message">Questa app è stata creata da Paolo Venturato, per se stesso e gli amici...</string>
+    <string name="dictionary_type">dictionary_type</string>
+    <string name="learners_dict">Learners</string>
+    <string name="collegiate_dict">Collegiate</string>
+</resources>

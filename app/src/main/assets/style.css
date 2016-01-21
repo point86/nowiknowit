@@ -1,0 +1,83 @@
+ *{
+		font-family: sans-serif;
+ }
+ hw {
+		color: white;
+        text-align: center;
+        font-weight: bold;
+        font-size: 125%;
+		text-align: center;
+        border-radius: 15px;
+        border: 4px solid #000000;
+        background: #000000;
+    }
+pr	{
+		font-family: "Times New Roman";
+		display: block;
+	}
+
+pr::before{
+		content: "/";
+	}
+pr::after {
+    content: "/";
+	}
+fl	{
+		color: gray;
+		font-family: sans-serif;
+		font-style: italic;
+		display: block;
+	}
+def {
+		background: #C7E0FF;
+		display: block;
+		font-family: sans-serif;
+		border-radius: 10px;
+		border: 2px solid #C7E0FF;
+        padding: 10px;
+
+	}
+dt 	{
+		display: block;
+		font-family: sans-serif;
+	}
+gram{
+	font-style: italic;
+}
+sxn{
+	font-family: "Times New Roman";
+}
+sn{
+	font-weight: bold;
+}
+sl{
+	font-style: italyc;
+}
+gram::before{
+    	content: "[";
+}
+gram::after {
+   content: "]";
+}
+vi::before{
+    	content: "<";
+}
+vi::after {
+   content: ">";
+}
+wsgram{
+	font-family: sans-serif;
+}
+wsgram::before{
+    	content: "[";
+}
+wsgram::after {
+   content: "]";
+}
+wav {
+    visibility: hidden;
+}
+
+it{
+	font-style: italic;
+}

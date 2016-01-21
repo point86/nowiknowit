@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="dictionary_type">
+        <item>Learners (simple)</item>
+        <item>Collegiate (advanced)</item>
+    </string-array>
+
+    <string-array name="dictionary_values">
+        <item>@string/learners_dict</item>
+        <item>@string/collegiate_dict</item>
+    </string-array>
+
+</resources>
