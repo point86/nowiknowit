@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity  {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.app_name)
                     .setMessage(R.string.info_message)
+                    .setIcon(R.mipmap.ic_launcher)
                     .show();
             return true;
         }

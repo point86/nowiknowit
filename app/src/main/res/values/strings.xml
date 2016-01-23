@@ -4,7 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_info">Info</string>
-    <string name="info_message">Questa app è stata creata da Paolo Venturato, per se stesso e gli amici...</string>
+    <string name="info_message">App created by Paolo Venturato.\n\nWords definitions are provided by:\nwww.Collinsdictionary.com \n©HarperCollins Publishers Ltd 2014\n\nThis software is released under\nApache License 2.0. \nPlease fork this project on GitHub:\nhttps://github.com/point86/nowiknowit</string>
     <string name="dictionary_type">dictionary_type</string>
     <string name="learners_dict">Learners</string>
     <string name="collegiate_dict">Collegiate</string>
