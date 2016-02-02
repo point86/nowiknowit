@@ -37,9 +37,9 @@ public class HistoryFragment extends ListFragment {
         Context context = getContext();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (sp.getString(context.getString(R.string.dictionary_type), context.getString(R.string.learners_dict)).equals(context.getString(R.string.learners_dict)))
+      /*  if (sp.getString(context.getString(R.string.dictionary_type), context.getString(R.string.learners_dict)).equals(context.getString(R.string.learners_dict)))
             table = Database.History.LEARNERS_TABLE;
-        else
+        else*/
             table = Database.History.COLLEGIATE_TABLE;
         //FIXME use database cass!
         db = database.getReadableDatabase();

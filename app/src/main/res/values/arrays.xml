@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="dictionary_type">
-        <item>Learners (simple)</item>
-        <item>Collegiate (advanced)</item>
+        <item>English (GB, advanced)</item>
+        <item>English (GB, easy)</item>
+        <item>English (US, easy)</item>
+        <item>Thesaurus</item>
+        <item>English - Italian</item>
+        <item>Italian - English</item>
+        <item>English - French</item>
+        <item>French - English </item>
+        <item>English - German</item>
+        <item>German - English</item>
+        <item>English - Spanish</item>
+        <item>Spanish - English</item>
     </string-array>
 
     <string-array name="dictionary_values">
-        <item>@string/learners_dict</item>
-        <item>@string/collegiate_dict</item>
+        <item>english</item>
+        <item>english-learner</item>
+        <item>american-learner</item>
+        <item>thesaurus</item>
+        <item>english-italian</item>
+        <item>italian-english</item>
+        <item>english-french</item>
+        <item>french-english</item>
+        <item>english-german</item>
+        <item>german-english</item>
+        <item>english-spanish</item>
+        <item>spanish-english</item>
     </string-array>
 
 </resources>

@@ -7,9 +7,10 @@
             android:key="@string/dictionary_type"
             android:title="Dictionary type"
             android:dialogTitle="Select dictionary:"
-            android:summary="Easy or advanced dictionary"
+            android:summary="Select language and type of dictionary"
             android:entries="@array/dictionary_type"
             android:entryValues="@array/dictionary_values"
-            android:defaultValue="@string/learners_dict" />
+            android:defaultValue="@array/dictionary_values" />
         </PreferenceCategory>
 </PreferenceScreen>
+<!-- TODO add new preference, API key here! -->

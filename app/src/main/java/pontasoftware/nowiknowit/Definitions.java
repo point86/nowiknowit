@@ -2,16 +2,23 @@ package pontasoftware.nowiknowit;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
+
+import android.content.Context;
 
 /**
  * Created by paolo on 06/10/2015.
@@ -19,10 +26,6 @@ import java.net.URL;
 public class Definitions {
     static final String QUERY_TYPE = "pontasoftware.englishtrainer.QUERY_TYPE";
     static final String TAG = "Definitions";
-    private  final String learnersBaseUrl = "http://www.dictionaryapi.com/api/v1/references/learners/xml/";
-    private final String learnersEndUrl = "?key=e108e6ab-63f8-441b-be73-d480c8085d91";
-    private final String collegiateBaseUrl = "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/";
-    private final String collegiateEndUrl = "?key=2ee02639-6b33-46d0-94d6-214736f39b79";
     Context context;
     Database database;
 
@@ -46,28 +49,27 @@ public class Definitions {
         if (term.equals("")){return "Empty string!";}
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        if(sp.getString(context.getString(R.string.dictionary_type), context.getString(R.string.learners_dict)).equals(context.getString(R.string.learners_dict)))
-            table = Database.History.LEARNERS_TABLE;
-        else
-            table = Database.History.COLLEGIATE_TABLE;
-
+        String dictionary = sp.getString("dictionary_type", "english");
+        String mwResponse;
+        /*
         String mwResponse = getLocalDefinition(term, table);
         if (mwResponse != null){
             database.insertHst(term, mwResponse, table);
             return mwResponse;
-        }
+        }*/
+
         try {
-            URL learnersUrl = new URL(learnersBaseUrl + term + learnersEndUrl);//non serve gestire entry-id
-            URL collegiateUrl = new URL(collegiateBaseUrl+term+collegiateEndUrl);
-            URL url;
-            if(table == Database.History.LEARNERS_TABLE)
-                url = learnersUrl;
-            else
-                url = collegiateUrl;
+            String baseUrl = "https://api.collinsdictionary.com/api/v1/dictionaries/";
+            String endUrl = "/search/first/?q=";
+            URL url = new URL(baseUrl + dictionary + endUrl + term);
             Log.d(TAG, url.toString());
 
+            Log.d(TAG, Arrays.toString(context.getResources().getStringArray(R.array.dictionary_type)));
             HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
+            httpConnection.setRequestProperty("Accept", "application/json" );
+            httpConnection.setRequestProperty("accessKey", "InpHbu5lZS1uEBe9kdzTvLAKULMDjlVE8WYjodSZebTlBBxmwjgbnTEFs1Y4nbLG");
             httpConnection.setRequestMethod("GET");
+
             int responseCode = httpConnection.getResponseCode();
 
             if (responseCode == 200) {
@@ -87,12 +89,16 @@ public class Definitions {
                 //il pretty printing, eliminando così la funzione.
                 //invariante: la definizione una parola inserita nel database non deve avere bisogno
                 //di ulteriore pretty printing.
-                database.insertHst(term, mwResponse, table);
+                //database.insertHst(term, mwResponse, table);
                 database.close();
+
+            //    JSONArray js = new JSONArray(mwResponse);
+                JSONObject ob = new JSONObject(mwResponse);
+                mwResponse = (String) ob.get("entryContent");
                 return mwResponse;
             }
-        } catch ( IOException e ) {
-            //e.printStackTrace();
+        } catch (Exception e ) { // IOException
+            e.printStackTrace();
             database.close();
             return "<center><br><br><br>I'm sorry but i can't retrieve this definition, check your internet connection :(</center>";
         }
