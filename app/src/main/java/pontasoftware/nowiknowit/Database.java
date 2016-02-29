@@ -16,26 +16,22 @@ public class Database extends SQLiteOpenHelper{
     private Context context;
     public static final class History implements BaseColumns{
         private History() {}
-        public static final String COLLEGIATE_TABLE = "COLLEGIATE";
-        public static final String LEARNERS_TABLE = "LEARNERS";
+        public static final String HISTORY_TABLE = "HISTORY";
+
         public static final String WORD = "WORD";
         public static final String DEF = "DEF";
-        public static final String NUM_SEARCHED = "NSEARCH"; //searched times
-        public static final String NUM_CORRECT = "NCORRECT"; //correct answers
-        private static final String CREATE_COLLEGIATE_TABLE = "CREATE TABLE " +
-                COLLEGIATE_TABLE + " (" +
+        public static final String TYPE = "TYPE"; //dictionary name (type)
+        public static final String NUM_SEARCHED = "NUM_SEARCHED"; //searched times
+        public static final String NUM_CORRECT = "NUM_CORRECT"; //correct answers
+        private static final String CREATE_HISTORY_TABLE = "CREATE TABLE " +
+                HISTORY_TABLE + " (" +
                 _ID  + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 WORD + " TEXT NOT NULL, " +
+                TYPE + " TEXT NOT NULL, " +
                 DEF  + " TEXT NOT NULL, "+
                 NUM_SEARCHED + " INT, "+
                 NUM_CORRECT  + " INT)";
-        private static final String CREATE_LEARNERS_TABLE = "CREATE TABLE " +
-                LEARNERS_TABLE + " (" +
-                _ID  + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                WORD + " TEXT NOT NULL, " +
-                DEF  + " TEXT NOT NULL, "+
-                NUM_SEARCHED + " INT, "+
-                NUM_CORRECT  + " INT)";
+
         //private static final String SQL_DELETE_ENTRIES = "DROP TABLE " + HISTORY_TABLE;//FIXME correct?
     }
 
@@ -48,8 +44,7 @@ public class Database extends SQLiteOpenHelper{
         this.context = context;
     }
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(History.CREATE_COLLEGIATE_TABLE);
-        db.execSQL(History.CREATE_LEARNERS_TABLE);
+        db.execSQL(History.CREATE_HISTORY_TABLE);
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
@@ -61,16 +56,18 @@ public class Database extends SQLiteOpenHelper{
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public void insertHst(String word, String def, String table){//FIXME return value??
+    //every time the user perform a search, if that term is not present in the local history, database
+    //will be updated, but the column NUM_SEARCHED must be the same for all rows.
+    public void insertHst(String word, String def, String dictionary){//FIXME return value?? table?
         SQLiteDatabase db = this.getWritableDatabase();
-        String selectString = "SELECT * FROM " + table + " WHERE " + History.WORD + " =?";
+        String selectString = "SELECT * FROM " + History.HISTORY_TABLE + " WHERE " + History.WORD + " =?";
         Cursor cursor = db.rawQuery(selectString, new String[] {word});
         if (cursor.moveToFirst()){ //value already present, we have only to update some columns
             Log.d(TAG, "-" +word + "- update columns");
             Integer oldV = cursor.getInt(cursor.getColumnIndexOrThrow(History.NUM_SEARCHED));
             ContentValues cv = new ContentValues();
             cv.put(History.NUM_SEARCHED, oldV + 1);
-            db.update(table, cv, History.WORD + " = '" + word +"'", null);
+            db.update(History.HISTORY_TABLE, cv, History.WORD + " = '" + word +"'", null);
         }
         else {
             Log.d(TAG, "-" +word + "- inserting it");
@@ -79,8 +76,9 @@ public class Database extends SQLiteOpenHelper{
             values.put(History.DEF, def);
             values.put(History.NUM_SEARCHED, 1);
             values.put(History.NUM_CORRECT, 0);
+            values.put(History.TYPE, dictionary);
             // Insert the new row, returning the primary key value of the new row
-            db.insert(table, null, values);
+            db.insert(History.HISTORY_TABLE, null, values);
         }
         db.close();
     }

@@ -24,7 +24,6 @@ import android.content.Context;
  * Created by paolo on 06/10/2015.
  */
 public class Definitions {
-    static final String QUERY_TYPE = "pontasoftware.englishtrainer.QUERY_TYPE";
     static final String TAG = "Definitions";
     Context context;
     Database database;
@@ -34,9 +33,12 @@ public class Definitions {
         this.database = new Database(context);
     }
 
-    private String getLocalDefinition(String term, String table){
+    private String getLocalDefinition(String term, String dictionary){
         SQLiteDatabase db = database.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM "+ table +" WHERE WORD == \""+term+"\";", null);
+        //FIXME completare con colonna giusta!
+        //Cursor cursor = db.rawQuery("SELECT * FROM "+ Database.History.HISTORY_TABLE +" WHERE WORD == \""+term+"\";", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ Database.History.HISTORY_TABLE +" WHERE " + Database.History.WORD + " == \""+term+"\"" +
+                " AND " + Database.History.TYPE + " == \""+ dictionary+"\"", null);
         if (cursor.moveToFirst()){
             database.close();
             return cursor.getString(cursor.getColumnIndexOrThrow("DEF"));
@@ -45,18 +47,15 @@ public class Definitions {
         return null;
     }
     public String getDefinition(String term) {
-        String table;
         if (term.equals("")){return "Empty string!";}
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        String dictionary = sp.getString("dictionary_type", "english");
-        String mwResponse;
-        /*
-        String mwResponse = getLocalDefinition(term, table);
+        String dictionary = sp.getString("dictionary_type", "english-learner");
+        String mwResponse = getLocalDefinition(term, dictionary);
         if (mwResponse != null){
-            database.insertHst(term, mwResponse, table);
+            database.insertHst(term, mwResponse, dictionary);
             return mwResponse;
-        }*/
+        }
 
         try {
             String baseUrl = "https://api.collinsdictionary.com/api/v1/dictionaries/";
@@ -64,7 +63,6 @@ public class Definitions {
             URL url = new URL(baseUrl + dictionary + endUrl + term);
             Log.d(TAG, url.toString());
 
-            Log.d(TAG, Arrays.toString(context.getResources().getStringArray(R.array.dictionary_type)));
             HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
             httpConnection.setRequestProperty("Accept", "application/json" );
             httpConnection.setRequestProperty("accessKey", "InpHbu5lZS1uEBe9kdzTvLAKULMDjlVE8WYjodSZebTlBBxmwjgbnTEFs1Y4nbLG");
@@ -89,12 +87,13 @@ public class Definitions {
                 //il pretty printing, eliminando così la funzione.
                 //invariante: la definizione una parola inserita nel database non deve avere bisogno
                 //di ulteriore pretty printing.
-                //database.insertHst(term, mwResponse, table);
+                database.insertHst(term, mwResponse, dictionary);
                 database.close();
 
             //    JSONArray js = new JSONArray(mwResponse);
                 JSONObject ob = new JSONObject(mwResponse);
                 mwResponse = (String) ob.get("entryContent");
+                database.close();
                 return mwResponse;
             }
         } catch (Exception e ) { // IOException

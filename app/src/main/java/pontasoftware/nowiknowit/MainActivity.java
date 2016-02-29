@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity  {
     CharSequence Titles[]={"Quiz", "Dictionary", "History"};
     int Numboftabs =3;
     private final String TAG = "MainActivity";
+    Definitions def = new Definitions(this);
 
     @Override
     protected void onNewIntent(Intent intent) { handleIntent(intent);}
@@ -41,16 +42,14 @@ public class MainActivity extends AppCompatActivity  {
     private void handleIntent(Intent intent){
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String search_query = intent.getStringExtra(SearchManager.QUERY);
-            String search_type = intent.getStringExtra(Definitions.QUERY_TYPE);
-            handleSearch(search_query, search_type);
+            handleSearch(search_query);
         }
     }
 
-    private void handleSearch(String search_query, String search_type) {
+    private void handleSearch(String search_query) {
         WebView webView = (WebView) findViewById(R.id.tab_2_webview);
         String wrResponse;
-        Definitions def = new Definitions(this);
-        wrResponse = def.getDefinition(search_query);
+        wrResponse = def.getDefinition(search_query);//TODO getHTMLDefinition? with prettyprinting iside?
         wrResponse = def.prettyPrint(wrResponse);
         webView.loadDataWithBaseURL("file:///android_asset/", wrResponse, "text/html", "UTF-8", null);
         pager.setCurrentItem(1);
@@ -126,12 +125,7 @@ public class MainActivity extends AppCompatActivity  {
             startActivity(intent);
             return true;
         }
-/*        if (id == R.id.download) {
-            Downloader dwn = new Downloader();
-            String eseguite = dwn.eseguite.toString();
-            Toast toast = Toast.makeText(context, "Scaricate "+eseguite+" definizioni", Toast.LENGTH_LONG);//FIXME non piu utile..
-            toast.show();
-        }*/
+
         if (id == R.id.action_info) {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.app_name)

@@ -10,7 +10,7 @@
             android:summary="Select language and type of dictionary"
             android:entries="@array/dictionary_type"
             android:entryValues="@array/dictionary_values"
-            android:defaultValue="@array/dictionary_values" />
+            android:defaultValue="english-learner" />
         </PreferenceCategory>
 </PreferenceScreen>
 <!-- TODO add new preference, API key here! -->

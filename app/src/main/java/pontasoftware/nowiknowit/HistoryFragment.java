@@ -24,7 +24,6 @@ import java.util.Arrays;
 public class HistoryFragment extends ListFragment {
     private String TAG = "HistoryFragment";
     HistoryCursorAdapter historyAdapter;
-    String table;
     Database database;// = new Database(getContext());
     SQLiteDatabase db;// = database.getReadableDatabase();
 
@@ -32,18 +31,13 @@ public class HistoryFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //database = new Database(getContext());
         database = new Database(getContext());
         Context context = getContext();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        String dictionary = sp.getString("dictionary_type", "english-learner");
 
-      /*  if (sp.getString(context.getString(R.string.dictionary_type), context.getString(R.string.learners_dict)).equals(context.getString(R.string.learners_dict)))
-            table = Database.History.LEARNERS_TABLE;
-        else*/
-            table = Database.History.COLLEGIATE_TABLE;
-        //FIXME use database cass!
         db = database.getReadableDatabase();
-        Cursor todoCursor = db.rawQuery("SELECT * FROM " + table + " ORDER BY " + Database.History._ID + " DESC;", null);
+        Cursor todoCursor = db.rawQuery("SELECT * FROM " + Database.History.HISTORY_TABLE + " ORDER BY " + Database.History._ID + " DESC;", null);
         historyAdapter = new HistoryCursorAdapter(getContext(), todoCursor, 0);
 
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -92,7 +86,7 @@ public class HistoryFragment extends ListFragment {
                         words_counter++;
                     }
                     Log.d(TAG, "Deleting: " + Arrays.toString(words));
-                    database.removeHst(words, table);
+                    database.removeHst(words, Database.History.HISTORY_TABLE);
                     mode.finish();
                     break;
                 default:
