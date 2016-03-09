@@ -34,9 +34,8 @@ public class HistoryFragment extends ListFragment {
         database = new Database(getContext());
         Context context = getContext();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        String dictionary = sp.getString("dictionary_type", "english-learner");
-
         db = database.getReadableDatabase();
+        //same query that don't display thesaurus words: " WHERE (DICT_NAME <> "thesaurus") ORDER BY
         Cursor todoCursor = db.rawQuery("SELECT * FROM " + Database.History.HISTORY_TABLE + " ORDER BY " + Database.History._ID + " DESC;", null);
         historyAdapter = new HistoryCursorAdapter(getContext(), todoCursor, 0);
 
@@ -100,8 +99,7 @@ public class HistoryFragment extends ListFragment {
 
         public void onDestroyActionMode(ActionMode mode) {        }
 
-        public void onItemCheckedStateChanged(ActionMode mode,
-                                              int position, long id, boolean checked) {
+        public void onItemCheckedStateChanged(ActionMode mode,int position, long id, boolean checked) {
             final int checkedCount = getListView().getCheckedItemCount();
             switch (checkedCount) {
                 case 0:

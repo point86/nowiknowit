@@ -6,6 +6,7 @@ package pontasoftware.nowiknowit;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceFragment;
@@ -42,18 +43,10 @@ public class MainActivity extends AppCompatActivity  {
     private void handleIntent(Intent intent){
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String search_query = intent.getStringExtra(SearchManager.QUERY);
-            handleSearch(search_query);
+            new SearchWordTask().execute(search_query);
         }
     }
 
-    private void handleSearch(String search_query) {
-        WebView webView = (WebView) findViewById(R.id.tab_2_webview);
-        String wrResponse;
-        wrResponse = def.getDefinition(search_query);//TODO getHTMLDefinition? with prettyprinting iside?
-        wrResponse = def.prettyPrint(wrResponse);
-        webView.loadDataWithBaseURL("file:///android_asset/", wrResponse, "text/html", "UTF-8", null);
-        pager.setCurrentItem(1);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,5 +147,24 @@ public class MainActivity extends AppCompatActivity  {
         }*/
     }
 
+    private class SearchWordTask extends AsyncTask<String, Void, String> {
+        WebView webView = (WebView) findViewById(R.id.tab_2_webview);
+        String wrResponse;
+
+        protected String doInBackground(String... search_query) {
+            wrResponse = def.getDefinition(search_query[0]);//TODO getHTMLDefinition? with prettyprinting iside?
+            return def.prettyPrint(wrResponse);
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            webView.loadDataWithBaseURL("file:///android_asset/", wrResponse, "text/html", "UTF-8", null);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            pager.setCurrentItem(1);
+            webView.loadUrl("file:///android_asset/animation.html");
+        }
+    }
 
 }

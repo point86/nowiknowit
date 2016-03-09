@@ -35,10 +35,7 @@ public class Definitions {
 
     private String getLocalDefinition(String term, String dictionary){
         SQLiteDatabase db = database.getReadableDatabase();
-        //FIXME completare con colonna giusta!
-        //Cursor cursor = db.rawQuery("SELECT * FROM "+ Database.History.HISTORY_TABLE +" WHERE WORD == \""+term+"\";", null);
-        Cursor cursor = db.rawQuery("SELECT * FROM "+ Database.History.HISTORY_TABLE +" WHERE " + Database.History.WORD + " == \""+term+"\"" +
-                " AND " + Database.History.TYPE + " == \""+ dictionary+"\"", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM HISTORY WHERE WORD == \""+term+"\" AND DICT_NAME == \""+ dictionary+"\"", null);
         if (cursor.moveToFirst()){
             database.close();
             return cursor.getString(cursor.getColumnIndexOrThrow("DEF"));
@@ -53,6 +50,7 @@ public class Definitions {
         String dictionary = sp.getString("dictionary_type", "english-learner");
         String mwResponse = getLocalDefinition(term, dictionary);
         if (mwResponse != null){
+            //row will only be updated
             database.insertHst(term, mwResponse, dictionary);
             return mwResponse;
         }

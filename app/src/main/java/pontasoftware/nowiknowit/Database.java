@@ -20,14 +20,14 @@ public class Database extends SQLiteOpenHelper{
 
         public static final String WORD = "WORD";
         public static final String DEF = "DEF";
-        public static final String TYPE = "TYPE"; //dictionary name (type)
+        public static final String DICT_NAME = "DICT_NAME"; //dictionary name (type)
         public static final String NUM_SEARCHED = "NUM_SEARCHED"; //searched times
         public static final String NUM_CORRECT = "NUM_CORRECT"; //correct answers
         private static final String CREATE_HISTORY_TABLE = "CREATE TABLE " +
                 HISTORY_TABLE + " (" +
                 _ID  + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 WORD + " TEXT NOT NULL, " +
-                TYPE + " TEXT NOT NULL, " +
+                DICT_NAME + " TEXT NOT NULL, " +
                 DEF  + " TEXT NOT NULL, "+
                 NUM_SEARCHED + " INT, "+
                 NUM_CORRECT  + " INT)";
@@ -76,7 +76,7 @@ public class Database extends SQLiteOpenHelper{
             values.put(History.DEF, def);
             values.put(History.NUM_SEARCHED, 1);
             values.put(History.NUM_CORRECT, 0);
-            values.put(History.TYPE, dictionary);
+            values.put(History.DICT_NAME, dictionary);
             // Insert the new row, returning the primary key value of the new row
             db.insert(History.HISTORY_TABLE, null, values);
         }
