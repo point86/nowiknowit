@@ -42,8 +42,12 @@ public class HistoryFragment extends ListFragment {
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         getListView().setMultiChoiceModeListener((new ModeCallback()));
         setListAdapter(historyAdapter);
-    }
+    } 
 
+    public void onPause (){
+        Log.d(TAG, "HistoryFragment is onPause()!");
+        super.onPause();
+    }
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         Intent intent=new Intent(getActivity(), MainActivity.class);
