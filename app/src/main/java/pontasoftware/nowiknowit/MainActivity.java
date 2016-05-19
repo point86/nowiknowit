@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +70,8 @@ public class MainActivity extends AppCompatActivity  {
         // Assigning ViewPager View and setting the adapter
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
+        pager.setOffscreenPageLimit(3); //otherwise historyfragment will be reinitialised every time
+
 
         // Assiging the Sliding Tab Layout View
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);
@@ -151,19 +152,18 @@ public class MainActivity extends AppCompatActivity  {
         WebView webView = (WebView) findViewById(R.id.tab_2_webview);
         String wrResponse;
 
+        @Override
+        protected void onPreExecute() {
+            pager.setCurrentItem(1);
+            webView.loadUrl("file:///android_asset/animation.html");
+        }
         protected String doInBackground(String... search_query) {
             wrResponse = def.getDefinition(search_query[0]);//TODO getHTMLDefinition? with prettyprinting iside?
             return def.prettyPrint(wrResponse);
         }
         @Override
         protected void onPostExecute(String result) {
-            webView.loadDataWithBaseURL("file:///android_asset/", wrResponse, "text/html", "UTF-8", null);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            pager.setCurrentItem(1);
-            webView.loadUrl("file:///android_asset/animation.html");
+            webView.loadDataWithBaseURL("file:///android_asset/", result, "text/html", "UTF-8", null);
         }
     }
 

@@ -58,11 +58,13 @@ public class Definitions {
         try {
             String baseUrl = "https://api.collinsdictionary.com/api/v1/dictionaries/";
             String endUrl = "/search/first/?q=";
-            URL url = new URL(baseUrl + dictionary + endUrl + term);
+            //pay attention to extra ASCII characters!
+            URL url = new URL(baseUrl + dictionary + endUrl + term.replace(" ","%20"));
             Log.d(TAG, url.toString());
 
             HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
             httpConnection.setRequestProperty("Accept", "application/json" );
+            httpConnection.setRequestProperty("Accept-Encoding", "gzip" );
             httpConnection.setRequestProperty("accessKey", "InpHbu5lZS1uEBe9kdzTvLAKULMDjlVE8WYjodSZebTlBBxmwjgbnTEFs1Y4nbLG");
             httpConnection.setRequestMethod("GET");
 
@@ -85,25 +87,30 @@ public class Definitions {
                 //il pretty printing, eliminando così la funzione.
                 //invariante: la definizione una parola inserita nel database non deve avere bisogno
                 //di ulteriore pretty printing.
-                database.insertHst(term, mwResponse, dictionary);
-                database.close();
 
-            //    JSONArray js = new JSONArray(mwResponse);
+//                JSONArray js = new JSONArray(mwResponse);
                 JSONObject ob = new JSONObject(mwResponse);
                 mwResponse = (String) ob.get("entryContent");
+                database.insertHst(term, mwResponse, dictionary);
                 database.close();
                 return mwResponse;
             }
+            if(responseCode==404){
+                //return "<center><br><br><br>There isn't a definition for the word \""+term+"\"!<br> Please check your word.</center>";
+                return "<div class=\"pulse\">There isn't a definition for the word \"" + term + "\"<br>Please check your syntax.</div>";
+            }
         } catch (Exception e ) { // IOException
-            e.printStackTrace();
+//            e.printStackTrace();
             database.close();
-            return "<center><br><br><br>I'm sorry but i can't retrieve this definition, check your internet connection :(</center>";
+            return "<div class=\"pulse\">Please check your internet connection :(</div>";
         }
         database.close();
-        return "<center><br><br><br>I'm sorry but i can't retrieve this definition, check your internet connection :(</center>";
+        return "<div class=\"pulse\">Something went wrong :(</div>";
     }
 
     public String prettyPrint(String wrResponse){
-        return "<meta charset=\"UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" + wrResponse;
+        //FIXME correggere con tipo di dati che mi ritorna il server. uso xsts?
+        //return "<html><meta charset=\"UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" + wrResponse +"</html>";
+        return "<html><meta charset=\"UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" + wrResponse +"</html>" ;
     }
 }

@@ -4,11 +4,17 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -18,31 +24,59 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import pontasoftware.nowiknowit.CustomLoader;
 
 import java.util.Arrays;
 
-public class HistoryFragment extends ListFragment {
+public class HistoryFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
     private String TAG = "HistoryFragment";
     HistoryCursorAdapter historyAdapter;
     Database database;// = new Database(getContext());
     SQLiteDatabase db;// = database.getReadableDatabase();
 
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.d(TAG, "onCreateLoader()");
+        return new CustomLoader(getContext());
+    }
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        historyAdapter.swapCursor(cursor);
+        Log.d(TAG, "onLoadFinished()");
+    }
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        historyAdapter.swapCursor(null);
+        Log.d(TAG, "onLoaderReset()");
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        database = new Database(getContext());
-        Context context = getContext();
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        db = database.getReadableDatabase();
+//        database = new Database(getContext());
+//        Context context = getContext();
+//        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+//        db = database.getReadableDatabase();
         //same query that don't display thesaurus words: " WHERE (DICT_NAME <> "thesaurus") ORDER BY
-        Cursor todoCursor = db.rawQuery("SELECT * FROM " + Database.History.HISTORY_TABLE + " ORDER BY " + Database.History._ID + " DESC;", null);
-        historyAdapter = new HistoryCursorAdapter(getContext(), todoCursor, 0);
+//        Cursor todoCursor = db.rawQuery("SELECT * FROM " + Database.History.HISTORY_TABLE + " ORDER BY " + Database.History._ID + " DESC;", null);
+//        historyAdapter = new HistoryCursorAdapter(getContext(), todoCursor, 0);
 
+        //this adapter is initialized with null cursos. It will be initialized later by the Loader methods, when load of data is finished.
+        historyAdapter = new HistoryCursorAdapter(getContext(), null, 0);
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         getListView().setMultiChoiceModeListener((new ModeCallback()));
         setListAdapter(historyAdapter);
-    } 
+//        context.getContentResolver().
+//                registerContentObserver(
+//                        Database.URI_DB,
+//                        true,
+//                        myObserver);
+
+        getLoaderManager().initLoader(0, null, this);
+    }
 
     public void onPause (){
         Log.d(TAG, "HistoryFragment is onPause()!");
@@ -120,6 +154,22 @@ public class HistoryFragment extends ListFragment {
         }
 
     }
+    class MyObserver extends ContentObserver {
+        public MyObserver(Handler handler) {
+            super(handler);
+        }
 
+        @Override
+        public void onChange(boolean selfChange) {
+            this.onChange(selfChange, null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            // do s.th.
+            // depending on the handler you might be on the UI
+            // thread, so be cautious!
+        }
+    }
 
 }

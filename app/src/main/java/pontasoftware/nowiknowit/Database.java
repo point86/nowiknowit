@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -12,6 +13,7 @@ import android.util.Log;
  * Created by paolo on 01/09/2015.
  */
 public class Database extends SQLiteOpenHelper{
+    public static final Uri URI_DB = Uri.parse("sqlite://pontasoftware.nowiknowit/table");
     private final String TAG = "Database";
     private Context context;
     public static final class History implements BaseColumns{
@@ -80,6 +82,7 @@ public class Database extends SQLiteOpenHelper{
             // Insert the new row, returning the primary key value of the new row
             db.insert(History.HISTORY_TABLE, null, values);
         }
+        context.getContentResolver().notifyChange(URI_DB, null); //FIXME is it necessary?
         db.close();
     }
 
@@ -89,6 +92,7 @@ public class Database extends SQLiteOpenHelper{
             //FIXME wrap in String[] isn't overloading????
             db.delete(table, Database.History.WORD + " = ?", new String[] {word});
         }
+        context.getContentResolver().notifyChange(URI_DB, null); //FIXME is it necessary?
         db.close();
     }
 }

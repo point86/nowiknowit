@@ -1,6 +1,28 @@
- *{
+ .pulse
+  {
+   padding: 100px 10px;
+   color: black;
+   text-align: center;
+   animation: pulse 1s ease infinite;
+ }
+
+ @keyframes pulse {
+   0% {
+     transform: scale(1);
+   }
+
+   50% {
+     transform: scale(1.1);
+   }
+
+   100% {
+     transform: scale(1);
+   }
+ }
+  *{
 		font-family: sans-serif;
  }
+
  hw {
 		color: white;
         text-align: center;
