@@ -27,14 +27,14 @@ import android.widget.Toast;
 import pontasoftware.nowiknowit.CustomLoader;
 
 import java.util.Arrays;
+import java.util.Observer;
 
-public class HistoryFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class HistoryFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private String TAG = "HistoryFragment";
     HistoryCursorAdapter historyAdapter;
     Database database;// = new Database(getContext());
     SQLiteDatabase db;// = database.getReadableDatabase();
-
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -122,7 +122,6 @@ public class HistoryFragment extends ListFragment implements LoaderManager.Loade
                         }
                         words_counter++;
                     }
-                    Log.d(TAG, "Deleting: " + Arrays.toString(words));
                     database.removeHst(words, Database.History.HISTORY_TABLE);
                     mode.finish();
                     break;
@@ -154,22 +153,4 @@ public class HistoryFragment extends ListFragment implements LoaderManager.Loade
         }
 
     }
-    class MyObserver extends ContentObserver {
-        public MyObserver(Handler handler) {
-            super(handler);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            this.onChange(selfChange, null);
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            // do s.th.
-            // depending on the handler you might be on the UI
-            // thread, so be cautious!
-        }
-    }
-
 }

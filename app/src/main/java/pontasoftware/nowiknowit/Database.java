@@ -2,17 +2,21 @@ package pontasoftware.nowiknowit;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import java.util.Observable;
 
 /**
  * Created by paolo on 01/09/2015.
  */
-public class Database extends SQLiteOpenHelper{
+public class Database extends SQLiteOpenHelper  {
     public static final Uri URI_DB = Uri.parse("sqlite://pontasoftware.nowiknowit/table");
     private final String TAG = "Database";
     private Context context;
@@ -82,17 +86,26 @@ public class Database extends SQLiteOpenHelper{
             // Insert the new row, returning the primary key value of the new row
             db.insert(History.HISTORY_TABLE, null, values);
         }
-        context.getContentResolver().notifyChange(URI_DB, null); //FIXME is it necessary?
         db.close();
+        sendBroadcastNotification();
     }
 
     public void removeHst(String[] words, String table){
         SQLiteDatabase db = this.getWritableDatabase();
+        //FIXME is the for cycle really necessary? see String[] ;)
         for (String word: words) {
-            //FIXME wrap in String[] isn't overloading????
             db.delete(table, Database.History.WORD + " = ?", new String[] {word});
         }
-        context.getContentResolver().notifyChange(URI_DB, null); //FIXME is it necessary?
-        db.close();
+        db.close(); //FIXME close it every time????
+        sendBroadcastNotification();
+    }
+
+    public void sendBroadcastNotification(){
+        Log.d(TAG, "sendBroadcastNotification()");
+        Intent intent = new Intent("database-modified");
+        // You can also include some extra data.
+        intent.putExtra("message", "maybe put some usefel object?"); //FIXME
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
     }
 }

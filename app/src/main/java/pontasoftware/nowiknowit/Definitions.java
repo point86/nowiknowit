@@ -1,11 +1,13 @@
 package pontasoftware.nowiknowit;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -17,13 +19,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Observable;
 
 import android.content.Context;
 
 /**
  * Created by paolo on 06/10/2015.
+ *
+ * Class responsible for managing all definitions:
+ *     local search (database)
+ *     internet search
+ *     remove stored definitions
  */
-public class Definitions {
+public class Definitions  {
     static final String TAG = "Definitions";
     Context context;
     Database database;
@@ -107,6 +115,7 @@ public class Definitions {
         database.close();
         return "<div class=\"pulse\">Something went wrong :(</div>";
     }
+
 
     public String prettyPrint(String wrResponse){
         //FIXME correggere con tipo di dati che mi ritorna il server. uso xsts?
