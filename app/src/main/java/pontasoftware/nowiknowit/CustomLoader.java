@@ -5,6 +5,8 @@ package pontasoftware.nowiknowit;
  * I writed my own custom loader beacause CursorLoader (provided by the Android framework) need
  * a Uri to work with (a ContentProvider). However implement a ContentProvider is too much for this
  * app, it don't need to share date with other apps nor the internet.
+ * Info to how to write  a loader:
+ * http://www.androiddesignpatterns.com/2012/08/implementing-loaders.html
  */
 
 import android.content.BroadcastReceiver;
@@ -31,18 +33,19 @@ public class CustomLoader extends AsyncTaskLoader<Cursor> {
         // The superclass constructor will store a reference to the Application
         // Context instead, and can be retrieved with a call to getContext().
         super(ctx);
-        LocalBroadcastManager.getInstance(ctx).registerReceiver(mMessageReceiver,
-                new IntentFilter("database-modified"));
+//        LocalBroadcastManager.getInstance(ctx).registerReceiver(observer,
+//                new IntentFilter("database-modified"));
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            String message = intent.getStringExtra("message");
-            Log.d(TAG, "Got message: " + message);
-            onContentChanged();
-        }
+    //this class is always present,
+    private BroadcastReceiver observer = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // Get extra data included in the Intent
+        String message = intent.getStringExtra("message");
+        Log.d(TAG, "Got message: " + message);
+        onContentChanged();
+    }
     };
 
     @Override
@@ -61,32 +64,47 @@ public class CustomLoader extends AsyncTaskLoader<Cursor> {
         //data.moveToFirst(); //FIXME it's really necessary?
         return data;
     }
+
+    //delivers the result (data) to the listener. Will be passed to method onLoadFinished
+    //in HistoryFragment
     @Override public void deliverResult(Cursor c) {
         Log.d(TAG, "deliverResult()");
         data = c;
+
         super.deliverResult(data);
     }
     @Override protected void onStartLoading() {
-        //TODO register an observer http://www.androiddesignpatterns.com/2012/08/implementing-loaders.html
-
         if (data != null)
+            //data is already present, we have only to deliver it.
             deliverResult(data);
         else {
-            Log.d(TAG, "data is NULL!!!!!");
+            Log.d(TAG, "registerReceiver(observer....)");
+            LocalBroadcastManager.getInstance(getContext()).registerReceiver(observer,
+                    new IntentFilter("database-modified"));
             forceLoad();
         }
         Log.d(TAG, "onStartLoading()");
     }
     @Override protected void onStopLoading() {
         Log.d(TAG, "onStopLoading()");
-        //cancelLoad();
+        cancelLoad();
     }
     @Override public void onCanceled(Cursor c) {
         Log.d(TAG, "onCanceled()");
+        super.onCanceled(c);
+        c.close();
+
     }
+//    Loaders in a reset state should not execute new loads, should not deliver new results, and should not monitor for changes
     @Override protected void onReset() {
         Log.d(TAG, "onReset()");
+        onStopLoading(); //stop the loader
+        //clear all resources
+        if (data != null) {
+            data.close();
+            data = null;
+        }
+        //unregister observer
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(observer);
     }
-
-
 }

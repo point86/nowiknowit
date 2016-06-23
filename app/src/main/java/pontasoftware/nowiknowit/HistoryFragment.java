@@ -33,8 +33,6 @@ public class HistoryFragment extends ListFragment implements LoaderManager.Loade
 
     private String TAG = "HistoryFragment";
     HistoryCursorAdapter historyAdapter;
-    Database database;// = new Database(getContext());
-    SQLiteDatabase db;// = database.getReadableDatabase();
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
