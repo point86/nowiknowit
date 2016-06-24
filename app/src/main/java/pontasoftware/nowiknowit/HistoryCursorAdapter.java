@@ -32,9 +32,9 @@ public class HistoryCursorAdapter extends CursorAdapter {
         TextView tv_ncorrect = (TextView) view.findViewById(R.id.tv_ncorrect);
 
         // Extract properties from cursor
-        String word = cursor.getString(cursor.getColumnIndexOrThrow(Database.History.WORD));
-        Integer num_searched = cursor.getInt(cursor.getColumnIndexOrThrow(Database.History.NUM_SEARCHED));
-        Integer num_correct = cursor.getInt(cursor.getColumnIndexOrThrow(Database.History.NUM_CORRECT));
+        String word = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseOpenHelper.History.WORD));
+        Integer num_searched = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseOpenHelper.History.NUM_SEARCHED));
+        Integer num_correct = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseOpenHelper.History.NUM_CORRECT));
             // Populate fields with extracted properties
         tv_word.setText(word);
         tv_nsearch.setText(num_searched.toString() + " searches, ");

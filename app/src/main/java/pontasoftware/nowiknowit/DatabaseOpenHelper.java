@@ -11,14 +11,12 @@ import android.provider.BaseColumns;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import java.util.Observable;
-
 /**
  * Created by paolo on 01/09/2015.
  */
-public class Database extends SQLiteOpenHelper  {
+public class DatabaseOpenHelper extends SQLiteOpenHelper  {
     public static final Uri URI_DB = Uri.parse("sqlite://pontasoftware.nowiknowit/table");
-    private final String TAG = "Database";
+    private final String TAG = "DatabaseOpenHelper";
     private Context context;
     public static final class History implements BaseColumns{
         private History() {}
@@ -41,11 +39,11 @@ public class Database extends SQLiteOpenHelper  {
         //private static final String SQL_DELETE_ENTRIES = "DROP TABLE " + HISTORY_TABLE;//FIXME correct?
     }
 
-    // If you change the database schema, you must increment the database version.
+    // If you change the databaseOpenHelper schema, you must increment the databaseOpenHelper version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "data.db";
 
-    public Database(Context context) {
+    public DatabaseOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
     }
@@ -53,7 +51,7 @@ public class Database extends SQLiteOpenHelper  {
         db.execSQL(History.CREATE_HISTORY_TABLE);
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
+        // This databaseOpenHelper is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         //db.execSQL(SQL_DELETE_ENTRIES); TODO
         onCreate(db);
@@ -62,7 +60,7 @@ public class Database extends SQLiteOpenHelper  {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    //every time the user perform a search, if that term is not present in the local history, database
+    //every time the user perform a search, if that term is not present in the local history, databaseOpenHelper
     //will be updated, but the column NUM_SEARCHED must be the same for all rows.
     public void insertHst(String word, String def, String dictionary){//FIXME return value?? table?
         SQLiteDatabase db = this.getWritableDatabase();
@@ -94,7 +92,7 @@ public class Database extends SQLiteOpenHelper  {
         SQLiteDatabase db = this.getWritableDatabase();
         //FIXME is the for cycle really necessary? see String[] ;)
         for (String word: words) {
-            db.delete(table, Database.History.WORD + " = ?", new String[] {word});
+            db.delete(table, DatabaseOpenHelper.History.WORD + " = ?", new String[] {word});
         }
         db.close(); //FIXME close it every time????
         sendBroadcastNotification();
@@ -102,7 +100,7 @@ public class Database extends SQLiteOpenHelper  {
 
     public void sendBroadcastNotification(){
         Log.d(TAG, "sendBroadcastNotification()");
-        Intent intent = new Intent("database-modified");
+        Intent intent = new Intent("databaseOpenHelper-modified");
         // You can also include some extra data.
         intent.putExtra("message", "maybe put some usefel object?"); //FIXME
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

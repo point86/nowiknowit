@@ -19,9 +19,6 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import java.util.Observable;
-import java.util.Observer;
-
 public class CustomLoader extends AsyncTaskLoader<Cursor> {
     private final String TAG = "CustomLoader";
     private Cursor data = null;
@@ -34,7 +31,7 @@ public class CustomLoader extends AsyncTaskLoader<Cursor> {
         // Context instead, and can be retrieved with a call to getContext().
         super(ctx);
 //        LocalBroadcastManager.getInstance(ctx).registerReceiver(observer,
-//                new IntentFilter("database-modified"));
+//                new IntentFilter("databaseOpenHelper-modified"));
     }
 
     //this class is always present,
@@ -53,13 +50,14 @@ public class CustomLoader extends AsyncTaskLoader<Cursor> {
         Log.d(TAG, "loadInBackground()");
         // This method is called on a background thread and should generate a
         // new set of data to be delivered back to the client.
-        Database database = new Database(getContext());
+        DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(getContext());
 
-        //FIXME fix this mess with SQLiteOpenHelper vs my Database class
+        //FIXME fix this mess with SQLiteOpenHelper vs my DatabaseOpenHelper class
         //SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        SQLiteDatabase db = database.getReadableDatabase();
+        SQLiteDatabase db = databaseOpenHelper.getReadableDatabase();
         //same query that don't display thesaurus words: " WHERE (DICT_NAME <> "thesaurus") ORDER BY
-        data = db.rawQuery("SELECT * FROM " + Database.History.HISTORY_TABLE + " ORDER BY " + Database.History._ID + " DESC;", null);
+        data = db.rawQuery("SELECT * FROM " + DatabaseOpenHelper.History.HISTORY_TABLE + " ORDER BY " + DatabaseOpenHelper.History._ID + " DESC;", null);
+
         //Log.d(TAG, "number of lines:" + data.getCount());
         //data.moveToFirst(); //FIXME it's really necessary?
         return data;
@@ -80,7 +78,7 @@ public class CustomLoader extends AsyncTaskLoader<Cursor> {
         else {
             Log.d(TAG, "registerReceiver(observer....)");
             LocalBroadcastManager.getInstance(getContext()).registerReceiver(observer,
-                    new IntentFilter("database-modified"));
+                    new IntentFilter("databaseOpenHelper-modified"));
             forceLoad();
         }
         Log.d(TAG, "onStartLoading()");
@@ -89,11 +87,11 @@ public class CustomLoader extends AsyncTaskLoader<Cursor> {
         Log.d(TAG, "onStopLoading()");
         cancelLoad();
     }
+
     @Override public void onCanceled(Cursor c) {
         Log.d(TAG, "onCanceled()");
         super.onCanceled(c);
         c.close();
-
     }
 //    Loaders in a reset state should not execute new loads, should not deliver new results, and should not monitor for changes
     @Override protected void onReset() {

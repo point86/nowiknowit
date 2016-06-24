@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity  {
     CharSequence Titles[]={"Quiz", "Dictionary", "History"};
     int Numboftabs =3;
     private final String TAG = "MainActivity";
-    Definitions def = new Definitions(this);
+    Definitions def;
 
     @Override
     protected void onNewIntent(Intent intent) { handleIntent(intent);}
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        def = new Definitions(this);
         Log.i(TAG, "onCreate(..)");
         setContentView(R.layout.activity_main);
 
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity  {
         // Assigning ViewPager View and setting the adapter
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
-        pager.setOffscreenPageLimit(3); //otherwise historyfragment will be reinitialised every time
+        pager.setOffscreenPageLimit(3); //all fragments are always active,otherwise historyfragment will be reinitialised every time
 
 
         // Assiging the Sliding Tab Layout View
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu); //FIXME
+        getMenuInflater().inflate(R.menu.menu_main, menu); //TODO
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setQueryHint("Type something here...");

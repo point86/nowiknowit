@@ -1,54 +1,45 @@
 package pontasoftware.nowiknowit;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Observable;
-
-import android.content.Context;
 
 /**
  * Created by paolo on 06/10/2015.
  *
  * Class responsible for managing all definitions:
- *     local search (database)
+ *     local search (databaseOpenHelper)
  *     internet search
  *     remove stored definitions
  */
 public class Definitions  {
     static final String TAG = "Definitions";
     Context context;
-    Database database;
+    DatabaseOpenHelper databaseOpenHelper;
 
     public Definitions(Context context){
         this.context = context;
-        this.database = new Database(context);
+        this.databaseOpenHelper = new DatabaseOpenHelper(context);
     }
 
     private String getLocalDefinition(String term, String dictionary){
-        SQLiteDatabase db = database.getReadableDatabase();
+        SQLiteDatabase db = databaseOpenHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM HISTORY WHERE WORD == \""+term+"\" AND DICT_NAME == \""+ dictionary+"\"", null);
         if (cursor.moveToFirst()){
-            database.close();
+            databaseOpenHelper.close();
             return cursor.getString(cursor.getColumnIndexOrThrow("DEF"));
         }
-        database.close();
+        databaseOpenHelper.close();
         return null;
     }
     public String getDefinition(String term) {
@@ -58,8 +49,8 @@ public class Definitions  {
         String dictionary = sp.getString("dictionary_type", "english-learner");
         String mwResponse = getLocalDefinition(term, dictionary);
         if (mwResponse != null){
-            //row will only be updated
-            database.insertHst(term, mwResponse, dictionary);
+            //interested row have only to be updated
+            databaseOpenHelper.insertHst(term, mwResponse, dictionary);
             return mwResponse;
         }
 
@@ -90,17 +81,17 @@ public class Definitions  {
                 }
                 responseReader.close();
                 mwResponse = response.toString();
-                //fixme do not add if word not found!
+                //TODO do not add if word not found!
                 //sistemando con un parser xml e crendo un oggetto apposito, si riesce a gestire qui
                 //il pretty printing, eliminando così la funzione.
-                //invariante: la definizione una parola inserita nel database non deve avere bisogno
+                //invariante: la definizione una parola inserita nel databaseOpenHelper non deve avere bisogno
                 //di ulteriore pretty printing.
 
 //                JSONArray js = new JSONArray(mwResponse);
                 JSONObject ob = new JSONObject(mwResponse);
                 mwResponse = (String) ob.get("entryContent");
-                database.insertHst(term, mwResponse, dictionary);
-                database.close();
+                databaseOpenHelper.insertHst(term, mwResponse, dictionary);
+                databaseOpenHelper.close();
                 return mwResponse;
             }
             if(responseCode==404){
@@ -109,16 +100,16 @@ public class Definitions  {
             }
         } catch (Exception e ) { // IOException
 //            e.printStackTrace();
-            database.close();
+            databaseOpenHelper.close();
             return "<div class=\"pulse\">Please check your internet connection :(</div>";
         }
-        database.close();
+        databaseOpenHelper.close();
         return "<div class=\"pulse\">Something went wrong :(</div>";
     }
 
 
     public String prettyPrint(String wrResponse){
-        //FIXME correggere con tipo di dati che mi ritorna il server. uso xsts?
+        //TODO correggere con tipo di dati che mi ritorna il server. uso xsts?
         //return "<html><meta charset=\"UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" + wrResponse +"</html>";
         return "<html><meta charset=\"UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" + wrResponse +"</html>" ;
     }
