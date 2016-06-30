@@ -22,6 +22,7 @@ import android.util.Log;
 public class CustomLoader extends AsyncTaskLoader<Cursor> {
     private final String TAG = "CustomLoader";
     private Cursor data = null;
+    DatabaseOpenHelper databaseHelper;
 
     public CustomLoader(Context ctx) {
         // Loaders may be used across multiple Activities (assuming they aren't
@@ -30,8 +31,7 @@ public class CustomLoader extends AsyncTaskLoader<Cursor> {
         // The superclass constructor will store a reference to the Application
         // Context instead, and can be retrieved with a call to getContext().
         super(ctx);
-//        LocalBroadcastManager.getInstance(ctx).registerReceiver(observer,
-//                new IntentFilter("databaseOpenHelper-modified"));
+        databaseHelper = DatabaseOpenHelper.getInstance(ctx);
     }
 
     //this class is always present,
@@ -50,16 +50,9 @@ public class CustomLoader extends AsyncTaskLoader<Cursor> {
         Log.d(TAG, "loadInBackground()");
         // This method is called on a background thread and should generate a
         // new set of data to be delivered back to the client.
-        DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(getContext());
-
-        //FIXME fix this mess with SQLiteOpenHelper vs my DatabaseOpenHelper class
-        //SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        SQLiteDatabase db = databaseOpenHelper.getReadableDatabase();
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
         //same query that don't display thesaurus words: " WHERE (DICT_NAME <> "thesaurus") ORDER BY
         data = db.rawQuery("SELECT * FROM " + DatabaseOpenHelper.History.HISTORY_TABLE + " ORDER BY " + DatabaseOpenHelper.History._ID + " DESC;", null);
-
-        //Log.d(TAG, "number of lines:" + data.getCount());
-        //data.moveToFirst(); //FIXME it's really necessary?
         return data;
     }
 

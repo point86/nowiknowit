@@ -93,7 +93,7 @@ public class HistoryFragment extends ListFragment implements LoaderManager.Loade
                         }
                         words_counter++;
                     }
-                    new DatabaseOpenHelper(getContext()).removeHst(words, DatabaseOpenHelper.History.HISTORY_TABLE);
+                    DatabaseOpenHelper.getInstance(getContext()).removeHst(words, DatabaseOpenHelper.History.HISTORY_TABLE);
                     mode.finish();
                     break;
                 default:

@@ -20,7 +20,6 @@ import java.net.URL;
  * Class responsible for managing all definitions:
  *     local search (databaseOpenHelper)
  *     internet search
- *     remove stored definitions
  */
 public class Definitions  {
     static final String TAG = "Definitions";
@@ -29,17 +28,16 @@ public class Definitions  {
 
     public Definitions(Context context){
         this.context = context;
-        this.databaseOpenHelper = new DatabaseOpenHelper(context);
+        this.databaseOpenHelper = DatabaseOpenHelper.getInstance(context);
     }
 
     private String getLocalDefinition(String term, String dictionary){
         SQLiteDatabase db = databaseOpenHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM HISTORY WHERE WORD == \""+term+"\" AND DICT_NAME == \""+ dictionary+"\"", null);
         if (cursor.moveToFirst()){
-            databaseOpenHelper.close();
             return cursor.getString(cursor.getColumnIndexOrThrow("DEF"));
         }
-        databaseOpenHelper.close();
+        db.close();
         return null;
     }
     public String getDefinition(String term) {
@@ -91,7 +89,6 @@ public class Definitions  {
                 JSONObject ob = new JSONObject(mwResponse);
                 mwResponse = (String) ob.get("entryContent");
                 databaseOpenHelper.insertHst(term, mwResponse, dictionary);
-                databaseOpenHelper.close();
                 return mwResponse;
             }
             if(responseCode==404){
@@ -100,10 +97,8 @@ public class Definitions  {
             }
         } catch (Exception e ) { // IOException
 //            e.printStackTrace();
-            databaseOpenHelper.close();
             return "<div class=\"pulse\">Please check your internet connection :(</div>";
         }
-        databaseOpenHelper.close();
         return "<div class=\"pulse\">Something went wrong :(</div>";
     }
 

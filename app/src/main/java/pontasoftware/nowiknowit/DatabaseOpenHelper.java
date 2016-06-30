@@ -18,6 +18,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper  {
     public static final Uri URI_DB = Uri.parse("sqlite://pontasoftware.nowiknowit/table");
     private final String TAG = "DatabaseOpenHelper";
     private Context context;
+    public static DatabaseOpenHelper sInstance = null;
+
     public static final class History implements BaseColumns{
         private History() {}
         public static final String HISTORY_TABLE = "HISTORY";
@@ -43,7 +45,11 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper  {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "data.db";
 
-    public DatabaseOpenHelper(Context context) {
+    /**
+            * constructor should be private to prevent direct instantiation.
+            * make call to static factory method "getInstance()" instead.
+    */
+    private DatabaseOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
     }
@@ -54,56 +60,63 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper  {
         // This databaseOpenHelper is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         //db.execSQL(SQL_DELETE_ENTRIES); TODO
+        db.execSQL("DROP TABLE IF EXISTS " + History.HISTORY_TABLE);
         onCreate(db);
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
-
-    //every time the user perform a search, if that term is not present in the local history, databaseOpenHelper
-    //will be updated, but the column NUM_SEARCHED must be the same for all rows.
+    public static DatabaseOpenHelper getInstance(Context ctx) {
+        /**
+         * use the application context as suggested by CommonsWare.
+         * this will ensure that you dont accidentally leak an Activitys
+         * context (see this article for more information:
+         * http://developer.android.com/resources/articles/avoiding-memory-leaks.html)
+         */
+        if (sInstance == null) {
+            sInstance = new DatabaseOpenHelper(ctx.getApplicationContext());
+        }
+        return sInstance;
+    }
     public void insertHst(String word, String def, String dictionary){//FIXME return value?? table?
-        SQLiteDatabase db = this.getWritableDatabase();
-        String selectString = "SELECT * FROM " + History.HISTORY_TABLE + " WHERE " + History.WORD + " =?";
+        String selectString = "SELECT * FROM " + DatabaseOpenHelper.History.HISTORY_TABLE + " WHERE " + DatabaseOpenHelper.History.WORD + " =?";
+        SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery(selectString, new String[] {word});
         if (cursor.moveToFirst()){ //value already present, we have only to update some columns
             Log.d(TAG, "-" +word + "- update columns");
-            Integer oldV = cursor.getInt(cursor.getColumnIndexOrThrow(History.NUM_SEARCHED));
+            Integer oldV = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseOpenHelper.History.NUM_SEARCHED));
             ContentValues cv = new ContentValues();
-            cv.put(History.NUM_SEARCHED, oldV + 1);
-            db.update(History.HISTORY_TABLE, cv, History.WORD + " = '" + word +"'", null);
+            cv.put(DatabaseOpenHelper.History.NUM_SEARCHED, oldV + 1);
+            db.update(DatabaseOpenHelper.History.HISTORY_TABLE, cv, DatabaseOpenHelper.History.WORD + " = '" + word +"'", null);
         }
         else {
             Log.d(TAG, "-" +word + "- inserting it");
             ContentValues values = new ContentValues();
-            values.put(History.WORD, word);
-            values.put(History.DEF, def);
-            values.put(History.NUM_SEARCHED, 1);
-            values.put(History.NUM_CORRECT, 0);
-            values.put(History.DICT_NAME, dictionary);
+            values.put(DatabaseOpenHelper.History.WORD, word);
+            values.put(DatabaseOpenHelper.History.DEF, def);
+            values.put(DatabaseOpenHelper.History.NUM_SEARCHED, 1);
+            values.put(DatabaseOpenHelper.History.NUM_CORRECT, 0);
+            values.put(DatabaseOpenHelper.History.DICT_NAME, dictionary);
             // Insert the new row, returning the primary key value of the new row
-            db.insert(History.HISTORY_TABLE, null, values);
+            db.insert(DatabaseOpenHelper.History.HISTORY_TABLE, null, values);
         }
         db.close();
         sendBroadcastNotification();
     }
 
     public void removeHst(String[] words, String table){
-        SQLiteDatabase db = this.getWritableDatabase();
-        //FIXME is the for cycle really necessary? see String[] ;)
+        SQLiteDatabase db = getWritableDatabase();
         for (String word: words) {
             db.delete(table, DatabaseOpenHelper.History.WORD + " = ?", new String[] {word});
         }
-        db.close(); //FIXME close it every time????
+        db.close();
         sendBroadcastNotification();
     }
-
     public void sendBroadcastNotification(){
         Log.d(TAG, "sendBroadcastNotification()");
         Intent intent = new Intent("databaseOpenHelper-modified");
         // You can also include some extra data.
         intent.putExtra("message", "maybe put some usefel object?"); //FIXME
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-
     }
 }
