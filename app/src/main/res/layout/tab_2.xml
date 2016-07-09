@@ -12,8 +12,18 @@
         android:id="@+id/textView"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" /> -->
+    <SearchView
+        android:id="@+id/tab_2_searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true">
+    </SearchView>
     <WebView
         android:id="@+id/tab_2_webview"
+        android:layout_below="@id/tab_2_searchView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+
 </RelativeLayout>
