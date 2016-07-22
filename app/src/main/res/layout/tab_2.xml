@@ -3,21 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/wordFragment_id">
-<!--
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Qui si cercano le parole"
-        android:id="@+id/textView"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" /> -->
     <SearchView
         android:id="@+id/tab_2_searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true">
+        android:clickable="true"
+        android:iconifiedByDefault="true"
+        android:layout_alignParentTop="true"
+        android:backgroundTint="@color/searchBar"
+        android:background="@color/searchBar">
     </SearchView>
     <WebView
         android:id="@+id/tab_2_webview"

@@ -6,4 +6,5 @@
     <color name="itemChecked">#ff00bf</color>
     <color name="itemActivated">#ec9451</color>
     <color name="itemPressed">#ff0100</color>
+    <color name="searchBar">#dbeaf9</color>
 </resources>
