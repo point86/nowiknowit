@@ -6,6 +6,7 @@ package pontasoftware.nowiknowit;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -160,12 +161,11 @@ public class MainActivity extends AppCompatActivity  {
         }
         protected String doInBackground(String... search_query) {
             wrResponse = def.getDefinition(search_query[0]);//TODO getHTMLDefinition? with prettyprinting iside?
-            return def.prettyPrint(wrResponse);
+            return def.insertHtmlTags(wrResponse, context);
         }
         @Override
         protected void onPostExecute(String result) {
             webView.loadDataWithBaseURL("file:///android_asset/", result, "text/html", "UTF-8", null);
         }
     }
-
 }

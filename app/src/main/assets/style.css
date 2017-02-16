@@ -1,3 +1,44 @@
+
+p.vertical_center{
+    right:50%;
+    bottom: 50%;
+    transform: translate(50%,50%);
+    position: absolute;
+}
+
+p.dictionary_label{
+  position: fixed;
+  top: 0px;
+  right: 1em;
+  width: auto;
+  line-height: 2em;
+  background-color: #4f9eff;
+  text-align: center;
+  vertical-align: center;
+  margin-top: 0;
+  color: white;
+}
+p.dictionary_label::before{
+   width: 0;
+   height: 0;
+   border-top: 2em solid #4f9eff;
+   border-left: 2em solid transparent;
+   content: " ";
+   position: absolute;
+   top: 0;
+   left: -2em;
+}
+p.dictionary_label::after{
+  width: 1em;
+  height: 2em;
+  background-color: #4f9eff;
+  content: "  ";
+  position:fixed;
+  top:0;
+  right:0;
+}
+
+
  .pulse
   {
    padding: 100px 10px;

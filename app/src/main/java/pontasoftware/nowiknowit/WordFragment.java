@@ -37,11 +37,14 @@ public class WordFragment extends Fragment {
             public void onClick(View v) {searchView.setIconified(false); }
         });
 
-
         WebView webView = (WebView)v.findViewById(R.id.tab_2_webview);
-        //<center> is deprecated in html5...
+      //  JavaScriptInterface jsInterface = new JavaScriptInterface(this);
+     //   webView.getSettings().setJavaScriptEnabled(true);
+       // webView.addJavascriptInterface(jsInterface, "JSInterface");
 
-        webView.loadData("<center><br><br><br>Touch the bar to search something...</center>", "text/html", "UTF-8");
+        String searchSomething = "<p class=vertical_center>Touch the bar to search something...</p>";
+        webView.loadDataWithBaseURL("file:///android_asset/", Definitions.insertHtmlTags(searchSomething, getActivity()), "text/html", "UTF-8", null);
+
         return v;
     }
 

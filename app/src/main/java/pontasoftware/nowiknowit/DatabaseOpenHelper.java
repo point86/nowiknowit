@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.support.v4.content.LocalBroadcastManager;
+//import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 /**
@@ -117,6 +117,6 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper  {
         Intent intent = new Intent("databaseOpenHelper-modified");
         // You can also include some extra data.
         intent.putExtra("message", "maybe put some usefel object?"); //FIXME
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+       // LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }

@@ -53,16 +53,28 @@ public class Definitions  {
         }
 
         try {
+            /* search tips for best matching:
+            https://api.collinsdictionary.com/api/v1/dictionaries/english/search/first/?q=word&format=html
+            q: (word to search)
+            format: html | xml (specify format of the "entryContent" field)
+            Accept: application/xml | application/html (specify type of response)
+
+            in the url we ask for the translation and how it is represented, in the http headers we
+            decide http response format.
+            */
+
             String baseUrl = "https://api.collinsdictionary.com/api/v1/dictionaries/";
-            String endUrl = "/search/first/?q=";
+            String apiMethod = "/search/first/?q=";
+            String format = "&format=html";
             //pay attention to extra ASCII characters!
-            URL url = new URL(baseUrl + dictionary + endUrl + term.replace(" ","%20"));
+            URL url = new URL(baseUrl + dictionary + apiMethod + term + format + term.replace(" ","%20"));
             Log.d(TAG, url.toString());
 
             HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
             httpConnection.setRequestProperty("Accept", "application/json" );
             httpConnection.setRequestProperty("Accept-Encoding", "gzip" );
-            httpConnection.setRequestProperty("accessKey", "InpHbu5lZS1uEBe9kdzTvLAKULMDjlVE8WYjodSZebTlBBxmwjgbnTEFs1Y4nbLG");
+            //TODO add setting menu for accesskey
+            httpConnection.setRequestProperty("accessKey", "PASTEHERE");
             httpConnection.setRequestMethod("GET");
 
             int responseCode = httpConnection.getResponseCode();
@@ -93,19 +105,22 @@ public class Definitions  {
             }
             if(responseCode==404){
                 //return "<center><br><br><br>There isn't a definition for the word \""+term+"\"!<br> Please check your word.</center>";
-                return "<div class=\"pulse\">There isn't a definition for the word \"" + term + "\"<br>Please check your syntax.</div>";
+//                return "<div class=\"pulse\">There isn't a definition for the word \"" + term + "\"<br>Please check your syntax.</div>";
+                return "<div class=\"pulse\">There isn't a definition for the word \"" + term + "\"<br>Please check your syntax.</div>" ;
             }
         } catch (Exception e ) { // IOException
 //            e.printStackTrace();
-            return "<div class=\"pulse\">Please check your internet connection :(</div>";
+//            return "<div class=\"pulse\">Please check your internet connection :(</div>";
+            return "<div class=\"pulse\">Please check your internet connection :(</p>" ;
         }
         return "<div class=\"pulse\">Something went wrong :(</div>";
+
     }
 
 
-    public String prettyPrint(String wrResponse){
-        //TODO correggere con tipo di dati che mi ritorna il server. uso xsts?
-        //return "<html><meta charset=\"UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" + wrResponse +"</html>";
-        return "<html><meta charset=\"UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" + wrResponse +"</html>" ;
+    public static String insertHtmlTags(String htmlText, Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        String dictionary = sp.getString("dictionary_type", "english-learner");
+        return "<html><meta charset=\"UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" /><body><p class=\"dictionary_label \">"+ dictionary+"</p>" + htmlText +"</body></html>" ;
     }
 }
